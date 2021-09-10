@@ -8,8 +8,8 @@ const db = require("./app/models");
 require('./app/db/associations');
 db.sequelize.sync();
 
-var corsOptions = {
-  origin: "http://localhost:3000"
+const corsOptions = {
+    origin: "http://localhost:3000"
 };
 
 
@@ -18,12 +18,12 @@ app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.get("/", (req, res) => {
-  res.json({ message: "OK - seconline" });
+    res.json({message: "OK - seconline"});
 });
 
 require("./app/routes/index.routes")(app);
 
 const PORT = process.env.PORT || 15000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+    console.log(`Server is running on port ${PORT}.`);
 });
