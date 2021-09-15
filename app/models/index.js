@@ -20,6 +20,8 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-//db.unidad = require("./unidad.model.js")(sequelize, Sequelize);
+db.factura = require("./factura.model.js")(sequelize, Sequelize);
+db.suscripcion = require("./suscripcion.model.js")(sequelize, Sequelize);
+db.usuario = require("./usuario.model.js")(sequelize, Sequelize);
 
 module.exports = db;
