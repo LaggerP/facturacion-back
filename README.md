@@ -1,7 +1,7 @@
 # facturacion-back
 
 
-### Última actualización: _10/10/2021_
+### Última actualización: _24/09/2021_
 ___
 
 
@@ -17,9 +17,11 @@ Crear un archivo `.env` con las siguientes variables de entorno:
 
 ```
  DEV=true
- AUTH_SECRET=tuSecretAuth
- AUTH_EXPIRES=1d
- AUTH_ROUNDS=10
+ FyA_AUTH_SECRET=tuSecretAuth
+ FyA_AUTH_EXPIRES=1d
+ FyA_AUTH_ROUNDS=10
+ SECRET_MOBILE_JWT=secretDeMobile
+ SECRET_WEB_JWT=secretDeWeb
  DEV_DB_HOST=localhost
  PROD_DB_PORT=3306
  DEV_DB_USER=tu_DB_local_USER

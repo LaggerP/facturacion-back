@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 module.exports = {
-    secret: process.env.AUTH_SECRET,
-    expires: process.env.AUTH_EXPIRES,
-    rounds: process.env.AUTH_ROUNDS
+    secret: process.env.FyA_AUTH_SECRET,
+    expires: process.env.FyA_AUTH_EXPIRES,
+    rounds: process.env.FyA_AUTH_ROUNDS
 }
