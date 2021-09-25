@@ -1,32 +1,31 @@
+require('dotenv').config()
 const jwt = require('jsonwebtoken');
 const db = require("../models");
-const Usuario = db.usuario;
-require('dotenv').config()
+const user = db.user;
 
 const authorization = function (req, res, next) {
     const token = req.headers['x-access-token'];
 
     //No hay token
-    let mensaje = {
+    let missingTokenMessage = {
         auth: false,
         mensaje: "ERROR-0001",
         status: 403
     }
 
     if (!token) {
-        res.status(403).send(mensaje);
+        res.status(403).send(missingTokenMessage);
     } else {
         //Error al autenticar token
         jwt.verify(token, process.env.AUTH_SECRET, function (err, decoded) {
-            let mensaje = {
+            let unauthorizedMessage = {
                 auth: false,
                 mensaje: "ERROR-0002",
-                status: 403
+                status: 401
             }
-            if (err)
-                res.status(403).send(mensaje);
+            if (err) res.status(403).send(unauthorizedMessage);
 
-            Usuario.findOne({
+            user.findOne({
                 where: {
                     id: decoded.usuario.id,
                     correo: decoded.usuario.correo,
@@ -52,4 +51,26 @@ const authorization = function (req, res, next) {
     }
 };
 
-module.exports = authorization;
+
+/**
+ * Checks if token from web/mobile app is valid.
+ * @param req
+ * @param res
+ * @param next
+ */
+const verifyExternalClientToken = async (req, res, next) => {
+    let {token, client} = req.body;
+    if (token.length === 0) res.status(400).json({error: "Provide a valid token "});
+    const secretKey = client === "web" ? process.env.SECRET_WEB_JWT : process.env.SECRET_MOBILE_JWT;
+    jwt.verify(token, secretKey, (err, decoded) => {
+        if (err) res.status(403).json({error: "Not Authorized"});
+        req.body.clientData = decoded;
+        next();
+    });
+
+};
+
+module.exports = {
+    authorization,
+    verifyExternalClientToken
+};
