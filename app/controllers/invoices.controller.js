@@ -1,8 +1,8 @@
 const db = require("../models");
-const Bill = db.bill;
+const Invoice = db.invoice;
 
-exports.getBillsByUserId = (req, res) => {
-    Bill.findAll({ where: { userId: req.params.userId } })
+exports.getInvoicesByUserId = (req, res) => {
+    Invoice.findAll({where: {userId: req.params.userId}})
       .then(data => {
           res.status(200).send(data);
       })
@@ -16,8 +16,13 @@ exports.getBillsByUserId = (req, res) => {
       });
 }
 
-exports.getBillById = (req, res) => {
-    Bill.findOne({where: {id: req.params.billId}})
+exports.getInvoicesById = (req, res) => {
+    Invoice.findOne({
+        where: {
+            userId: req.params.userId,
+            id: req.params.billId
+        }
+    })
       .then(data => {
           res.status(200).send(data);
       })

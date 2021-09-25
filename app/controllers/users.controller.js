@@ -15,3 +15,18 @@ exports.getUserByObjectId = (req, res) => {
           res.status(500).send(response);
       });
 }
+
+exports.getUserById = (req, res) => {
+    User.findOne({where: {id: req.params.id}})
+      .then(data => {
+          res.status(200).send(data);
+      })
+      .catch(err => {
+          const response = {
+              data: "Ususario no encontrado",
+              message: err.message || "Error",
+              status: 500
+          }
+          res.status(500).send(response);
+      });
+}

@@ -1,5 +1,5 @@
 const db = require("../models");
-const Subscription = db.suscription;
+const Subscription = db.subscription;
 
 exports.getSubscriptionsByUserId = (req, res) => {
     Subscription.findAll({ where: { userId: req.params.userId } })
