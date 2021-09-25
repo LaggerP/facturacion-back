@@ -7,7 +7,7 @@ module.exports = app => {
     const Authorization = require('../auth/authorization');
 
     router.use('/invoices', invoices);
-    router.use('subscriptions', subscriptions);
+    router.use('/subscriptions', subscriptions);
     router.use('/users', users);
 
     app.use('/api', router);
