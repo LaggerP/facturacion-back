@@ -1,9 +1,9 @@
 module.exports = (sequelize, Sequelize) => {
-    const Suscripcion = sequelize.define("suscripciones", {
-        usuarioId: {
+    const Subscription = sequelize.define("subscriptions", {
+        userId: {
             type: Sequelize.INTEGER,
         },
-        nombre: {
+        name: {
             type: Sequelize.STRING,
             validate: {
                 len: {
@@ -12,21 +12,21 @@ module.exports = (sequelize, Sequelize) => {
                 }
             }
         },
-        refPaqueteId: {
+        packageId: {
             type: Sequelize.INTEGER
         },
-        precio: {
+        cost: {
             type: Sequelize.FLOAT
         },
-        fechaAlta: {
+        entryDate: {
             type: Sequelize.DATE
         },
-        estado: {
+        bill_state: {
             type: Sequelize.INTEGER
         },
-        contratado: {
+        suscribed: {
             type: Sequelize.BOOLEAN
         },
     });
-    return Suscripcion;
+    return Subscription;
 };

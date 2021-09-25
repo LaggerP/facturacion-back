@@ -1,14 +1,14 @@
 const db = require("../models");
-const Bill = db.bill;
+const User = db.user;
 
-exports.getBills = (req, res) => {
-    Bill.findAll()
+exports.getUsers = (req, res) => {
+    User.findAll()
         .then(data => {
             res.status(200).send(data);
         })
         .catch(err => {
             const response = {
-                data: "Error al obtener facturas",
+                data: "Errpr al obtener usuarios",
                 message: err.message || "Error",
                 status: 500
             }
@@ -16,14 +16,14 @@ exports.getBills = (req, res) => {
         });
 }
 
-exports.getBillById = (req, res) => {
-    Bill.findOne({where: {id: req.params.billId}})
+exports.getUserById = (req, res) => {
+    User.findOne({where: {id: req.params.userId}})
         .then(data => {
             res.status(200).send(data);
         })
         .catch(err => {
             const response = {
-                data: "Factura no encontrada",
+                data: "Ususario no encontrado",
                 message: err.message || "Error",
                 status: 500
             }

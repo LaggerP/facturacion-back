@@ -1,20 +1,20 @@
 module.exports = (sequelize, Sequelize) => {
-    const Factura = sequelize.define("facturas", {
-        usuarioId: {
+    const Invoice = sequelize.define("Invoices", {
+        userId: {
             type: Sequelize.INTEGER,
         },
-        fechaFacturacion: {
+        billingDate: {
             type: Sequelize.DATE,
         },
-        montoTotal: {
+        totalAmount: {
             type: Sequelize.FLOAT
         },
-        nroFactura: {
+        invoiceNbr: {
             type: Sequelize.STRING
         },
-        descripcion: {
+        description: {
             type: Sequelize.TEXT
         }
     });
-    return Factura;
+    return Invoice;
 };

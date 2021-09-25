@@ -1,13 +1,13 @@
 const db = require("../models");
 
-const Suscripcion = db.suscripcion;
-const Usuario = db.usuario;
-const Factura = db.factura;
+const Subscription = db.suscripcion;
+const User = db.user;
+const Invoice = db.Invoice;
 
 //Suscripcion tiene un usuario
-Usuario.hasOne(Suscripcion, {foreignKey: 'usuarioId'});
-Suscripcion.belongsTo(Usuario, {foreignKey: 'usuarioId'});
+User.hasOne(Subscription, {foreignKey: 'userId'});
+Subscription.belongsTo(User, {foreignKey: 'userId'});
 
 //Factura tiene un usuario
-Usuario.hasOne(Factura, {foreignKey: 'usuarioId'});
-Factura.belongsTo(Usuario, {foreignKey: 'usuarioId'});
+User.hasOne(Invoice, {foreignKey: 'userId'});
+Invoice.belongsTo(User, {foreignKey: 'userId'});
