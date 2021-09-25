@@ -1,5 +1,15 @@
 module.exports = (sequelize, Sequelize) => {
     const User = sequelize.define("users", {
+        id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
+        objId: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            unique: true
+        },
         email: {
             type: Sequelize.STRING,
             allowNull: false,
@@ -12,6 +22,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         firstName: {
             type: Sequelize.STRING,
+            allowNull: false,
             validate: {
                 len: {
                     args: [2, 255],
@@ -21,6 +32,7 @@ module.exports = (sequelize, Sequelize) => {
         },
         lastName: {
             type: Sequelize.STRING,
+            allowNull: false,
             validate: {
                 len: {
                     args: [2, 255],

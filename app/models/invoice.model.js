@@ -1,19 +1,29 @@
 module.exports = (sequelize, Sequelize) => {
     const Invoice = sequelize.define("Invoices", {
+        id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
         userId: {
             type: Sequelize.INTEGER,
+            allowNull: false
         },
         billingDate: {
             type: Sequelize.DATE,
+            allowNull: false
         },
         totalAmount: {
-            type: Sequelize.FLOAT
+            type: Sequelize.FLOAT,
+            allowNull: false
         },
-        invoiceNbr: {
-            type: Sequelize.STRING
+        invoiceNumber: {
+            type: Sequelize.STRING,
+            allowNull: false
         },
         description: {
-            type: Sequelize.TEXT
+            type: Sequelize.TEXT,
+            allowNull: false
         }
     });
     return Invoice;

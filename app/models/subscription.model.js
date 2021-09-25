@@ -1,10 +1,17 @@
 module.exports = (sequelize, Sequelize) => {
     const Subscription = sequelize.define("subscriptions", {
+        id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            primaryKey: true
+        },
         userId: {
             type: Sequelize.INTEGER,
+            allowNull: false,
         },
         name: {
             type: Sequelize.STRING,
+            allowNull: false,
             validate: {
                 len: {
                     args: [2, 255],
@@ -12,17 +19,25 @@ module.exports = (sequelize, Sequelize) => {
                 }
             }
         },
+        subscriptionId: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+        },
         packageId: {
-            type: Sequelize.INTEGER
+            type: Sequelize.INTEGER,
+            allowNull: false,
         },
         cost: {
-            type: Sequelize.FLOAT
+            type: Sequelize.FLOAT,
+            allowNull: false,
         },
         entryDate: {
-            type: Sequelize.DATE
+            type: Sequelize.DATE,
+            allowNull: false,
         },
-        bill_state: {
-            type: Sequelize.INTEGER
+        billState: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
         },
         suscribed: {
             type: Sequelize.BOOLEAN

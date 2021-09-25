@@ -1,8 +1,8 @@
 const db = require("../models");
 
-const Subscription = db.suscripcion;
+const Subscription = db.subscription;
 const User = db.user;
-const Invoice = db.Invoice;
+const Invoice = db.invoice;
 
 //Suscripcion tiene un usuario
 User.hasOne(Subscription, {foreignKey: 'userId'});
