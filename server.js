@@ -9,7 +9,7 @@ require('./app/db/associations');
 db.sequelize.sync();
 
 const corsOptions = {
-    origin: "http://localhost:3000"
+    origin: "http://localhost:3000" || "https://facturacion-front.vercel.app/"
 };
 
 

@@ -31,15 +31,11 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.FLOAT,
             allowNull: false,
         },
-        entryDate: {
-            type: Sequelize.DATE,
-            allowNull: false,
-        },
         billState: {
             type: Sequelize.INTEGER,
             allowNull: false,
         },
-        suscribed: {
+        subscribed: {
             type: Sequelize.BOOLEAN
         },
     });
