@@ -8,6 +8,6 @@ router.get('/:userId', subscriptions.getSubscriptionsByUserId);
 router.post('/external/new', subscriptions.createExternalSubscription);
 
 // [INTEGRATION ENDPOINT] POST SUBSCRIPTION- /api/subscriptions/internal/new
-//router.post('/internal/new', subscriptions.createExternalSubscription);
+router.post('/internal/new', subscriptions.createInternalSubscription);
 
 module.exports = router;
