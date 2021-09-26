@@ -24,6 +24,10 @@ Crear un archivo `.env` con las siguientes variables de entorno:
  FyA_AUTH_SECRET=tuSecretAuth
  FyA_AUTH_EXPIRES=1d
  FyA_AUTH_ROUNDS=10
+ FyA_EMAIL_USER=tuUserEmail
+ FyA_EMAIL_PASS=tuPasswordEmail
+ FyA_EMAIL_SMTP=tuSMTP
+ SECRET_SSO_FyA_JWT=tokenSuministradoPorSSO
  SECRET_MOBILE_JWT=secretDeMobile
  SECRET_WEB_JWT=secretDeWeb
  DEV_DB_HOST=localhost
