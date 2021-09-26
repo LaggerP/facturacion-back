@@ -1,5 +1,7 @@
 const db = require("../models");
 const sequelize = require("sequelize");
+const axios = require("axios");
+
 const Invoice = db.invoice;
 const Subscription = db.subscription;
 
@@ -38,9 +40,12 @@ exports.getInvoicesById = async (req, res) => {
 }
 
 exports.createNewPaid = (req, res) => {
+    console.log(req.params)
     Subscription.findAll({where: {userId: req.params.userId}})
       .then(subscriptions => {
+          console.log(subscriptions.length)
           if (subscriptions.length !== 0) {
+              let createInvoice = false;
               let subscriptionID = 0;
               let invoiceData = {
                   userId: req.params.userId,
@@ -66,21 +71,26 @@ exports.createNewPaid = (req, res) => {
                   if (checkDate(createdAt)) {
                       invoiceData.totalAmount += cost;
                       invoiceData.description = invoiceData.description + ' ' + name + ',';
+                      createInvoice = true;
                   }
               })
+              if (createInvoice) {
+                  let status;
+                  Invoice.create(invoiceData)
+                    .then(data => {
+                        Subscription.update({billState: 1}, {where: {subscriptionId: subscriptionID}})
+                          .then(async updatedData => {
+                              status = await updateExternalSubscriptionStatus(subscriptionID, "PAGADO")
+                          })
+                          .catch(err => res.status(404).send(err))
+                    })
+                    .catch(err => res.status(404).send(err))
+                  if (status === 200) res.status(201).send("Invoice was created");
+                  else res.status(400).send("The subscription to modify doesn't exist [module subs]")
+              } else res.status(202).send("There are no subscriptions to create an invoice.");
 
-              Invoice.create(invoiceData)
-                .then(data => {
-                    Subscription.update({billState: 1}, {where: {subscriptionId: subscriptionID}})
-                      .then(async updatedData => {
-                          await updateExternalSubscriptionStatus(subscriptionID, "PAGADO")
-                      })
-                      .catch(err => res.status(404).send(err))
-                })
-                .catch(err => res.status(404).send(err))
-              res.status(201).send("Invoice was created");
-          }
-          throw "Cannot create invoice because userId doesn't exist"
+
+          } else throw "Cannot create invoice because userId doesn't exist"
       })
       .catch(err => res.status(404).send(err));
 }
@@ -92,7 +102,11 @@ const updateExternalSubscriptionStatus = (subscriptionId, state) => {
         "estado": state
     }
 
-    console.log(payload)
+
+    return axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/modify/status', payload)
+      .then(res => res.status)
+      .catch((err) => err.response.status);
+
 
 }
 
