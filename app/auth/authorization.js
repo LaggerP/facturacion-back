@@ -59,9 +59,9 @@ const authorization = function (req, res, next) {
  * @param next
  */
 const verifyExternalClientToken = async (req, res, next) => {
-    let {token, client} = req.body;
+    let {token, from} = req.params;
     if (token.length === 0) res.status(400).json({error: "Provide a valid token "});
-    const secretKey = client === "web" ? process.env.SECRET_WEB_JWT : process.env.SECRET_MOBILE_JWT;
+    const secretKey = from === "web" ? process.env.SECRET_WEB_JWT : process.env.SECRET_MOBILE_JWT;
     jwt.verify(token, secretKey, (err, decoded) => {
         if (err) res.status(403).json({error: "Not Authorized"});
         req.body.clientData = decoded;
