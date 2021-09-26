@@ -73,3 +73,45 @@ exports.createExternalSubscription = async (req, res) => {
         res.status(400).send("Bad register, user has already been subscribed.");
     }
 }
+
+
+/**
+ * CREATE new subscription row.
+ * [INTEGRATION SUBSCRIPTION MODULE]
+ * @param req {userId, name, subscriptionId, packageId, cost}
+ * @param res
+ */
+exports.createInternalSubscription = async (req, res) => {
+    const {userId, name, subscriptionId, packageId, cost} = req.body;
+
+    //Check if user was already subscribed to package.
+    const existingPackage = await Subscription.findOne({
+        where: {
+            [Op.and]: [
+                {packageId: packageId},
+                {userId: userId}
+            ]
+        }
+    })
+
+    if (existingPackage === null) {
+        await Subscription.create({
+            userId: userId,
+            name: name,
+            subscriptionId: subscriptionId,
+            packageId: packageId,
+            cost: cost,
+            billState: 1, // 1-PAGADO | 2-DEMORADO | 3-NO_PAGADO
+            subscribed: true
+        });
+        res.status(201).send("Correct registration.");
+    } else {
+        res.status(400).send("Bad registration, the user is already subscribed to those packages.");
+    }
+
+
+
+
+
+}
+

@@ -5,9 +5,7 @@ const Subscription = db.subscription;
 
 exports.getInvoicesByUserId = (req, res) => {
     Invoice.findAll({where: {userId: req.params.userId}})
-      .then(data => {
-          res.status(200).send(data);
-      })
+      .then(data => res.status(200).send(data))
       .catch(err => {
           const response = {
               data: "Error al obtener facturas",
@@ -26,9 +24,7 @@ exports.getInvoicesById = async (req, res) => {
         }
     })
       .then(data => {
-          if (data !== null) {
-              res.status(200).send(data);
-          }
+          if (data !== null) res.status(200).send(data);
           throw "Factura no encontrada"
       })
       .catch(err => {
@@ -76,17 +72,17 @@ exports.createNewPaid = (req, res) => {
               Invoice.create(invoiceData)
                 .then(data => {
                     Subscription.update({billState: 1}, {where: {subscriptionId: subscriptionID}})
-                      .then(async updatedData => {await updateExternalSubscriptionStatus(subscriptionID, "PAGADO")})
+                      .then(async updatedData => {
+                          await updateExternalSubscriptionStatus(subscriptionID, "PAGADO")
+                      })
                       .catch(err => res.status(404).send(err))
                 })
                 .catch(err => res.status(404).send(err))
               res.status(201).send("Invoice was created");
           }
-          throw "No hay suscripciones asociadas al userId provisto"
+          throw "Cannot create invoice because userId doesn't exist"
       })
-      .catch(err => {
-          res.status(404).send(err);
-      });
+      .catch(err => res.status(404).send(err));
 }
 
 
