@@ -9,17 +9,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             allowNull: false
         },
-        billingDate: {
-            type: Sequelize.DATE,
-            allowNull: false
-        },
         totalAmount: {
             type: Sequelize.FLOAT,
             allowNull: false
         },
         invoiceNumber: {
             type: Sequelize.STRING,
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         description: {
             type: Sequelize.TEXT,
