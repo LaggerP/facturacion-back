@@ -4,6 +4,11 @@ const {sendTestEmail} = require("../services/mailer")
 const Subscription = db.subscription;
 const User = db.user;
 
+/**
+ * GET all subscriptions by UserId
+ * @param req {userId}
+ * @param res
+ */
 exports.getSubscriptionsByUserId = (req, res) => {
     Subscription.findAll({where: {userId: req.params.userId}})
       .then(data => {
@@ -110,7 +115,5 @@ exports.createInternalSubscription = async (req, res) => {
     } else {
         res.status(400).send("Bad registration, the user is already subscribed to those packages.");
     }
-
-
 }
 

@@ -5,6 +5,11 @@ const axios = require("axios");
 const Invoice = db.invoice;
 const Subscription = db.subscription;
 
+/**
+ * GET all Invoices by UserId
+ * @param req {userId}
+ * @param res
+ */
 exports.getInvoicesByUserId = (req, res) => {
     Invoice.findAll({where: {userId: req.params.userId}})
       .then(data => res.status(200).send(data))
@@ -18,6 +23,11 @@ exports.getInvoicesByUserId = (req, res) => {
       });
 }
 
+/**
+ * GET one invoice by UserId
+ * @param req {userId}
+ * @param res
+ */
 exports.getInvoicesById = async (req, res) => {
     Invoice.findOne({
         where: {
@@ -39,14 +49,17 @@ exports.getInvoicesById = async (req, res) => {
       });
 }
 
+/**
+ * CREATE new payment by userId
+ * @param req {userId}
+ * @param res
+ */
 exports.createNewPaid = (req, res) => {
-    console.log(req.params)
     Subscription.findAll({where: {userId: req.params.userId}})
-      .then(subscriptions => {
-          console.log(subscriptions.length)
+      .then(async subscriptions => {
+          let subscriptionIDs = [];
           if (subscriptions.length !== 0) {
               let createInvoice = false;
-              let subscriptionID = 0;
               let invoiceData = {
                   userId: req.params.userId,
                   totalAmount: 0,
@@ -54,19 +67,9 @@ exports.createNewPaid = (req, res) => {
                   description: "Cobro de paquetes:"
               }
               subscriptions.map(sub => {
-                  const {
-                      id,
-                      userId,
-                      name,
-                      subscriptionId,
-                      packageId,
-                      cost,
-                      billState,
-                      subscribed,
-                      createdAt
-                  } = sub.dataValues;
+                  const {name, subscriptionId, cost, createdAt} = sub.dataValues;
 
-                  subscriptionID = subscriptionId;
+                  subscriptionIDs.push(subscriptionId);
 
                   if (checkDate(createdAt)) {
                       invoiceData.totalAmount += cost;
@@ -75,42 +78,48 @@ exports.createNewPaid = (req, res) => {
                   }
               })
               if (createInvoice) {
-                  let status;
-                  Invoice.create(invoiceData)
-                    .then(data => {
-                        Subscription.update({billState: 1}, {where: {subscriptionId: subscriptionID}})
-                          .then(async updatedData => {
-                              status = await updateExternalSubscriptionStatus(subscriptionID, "PAGADO")
-                          })
-                          .catch(err => res.status(404).send(err))
-                    })
-                    .catch(err => res.status(404).send(err))
+                  let status = await createNewInvoice(invoiceData, subscriptionIDs);
                   if (status === 200) res.status(201).send("Invoice was created");
                   else res.status(400).send("The subscription to modify doesn't exist [module subs]")
               } else res.status(202).send("There are no subscriptions to create an invoice.");
-
-
           } else throw "Cannot create invoice because userId doesn't exist"
       })
       .catch(err => res.status(404).send(err));
 }
 
-
-const updateExternalSubscriptionStatus = (subscriptionId, state) => {
-    let payload = {
-        "id_suscripcion": subscriptionId,
-        "estado": state
-    }
-
-
-    return axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/modify/status', payload)
-      .then(res => res.status)
-      .catch((err) => err.response.status);
-
-
+/**
+ * CREATE invoice and change all billState;
+ * @param invoice
+ * @param subscriptionIDs
+ */
+const createNewInvoice = async (invoice, subscriptionIDs) => {
+    const newInvoices = await Invoice.create(invoice);
+    if (newInvoices.dataValues !== null) {
+        for (const subsId of subscriptionIDs) {
+            await Subscription.update({billState: 1}, {where: {subscriptionId: subsId}});
+            const data = await updateExternalSubscriptionStatus(subsId, "PAGADO")
+            if (data === 400) return 400;
+        }
+        return 200;
+    } else return 400;
 }
 
+/**
+ * CHANGE subscription module BD status value;
+ * @param subscriptionId
+ * @param state
+ */
+const updateExternalSubscriptionStatus = async (subscriptionId, state) => {
+    let payload = {"id_suscripcion": subscriptionId, "estado": state}
+    return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/modify/status', payload)
+      .then(async res => res.status)
+      .catch((err) => err.response.status);
+}
 
+/**
+ * VERIFY if the date (_subDate from DB) is 30 days different from the current date;
+ * @param _subDate
+ */
 const checkDate = (_subDate) => {
     const date = new Date();
     const day = date.getDate();
