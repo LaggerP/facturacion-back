@@ -88,6 +88,37 @@ exports.createNewPaid = (req, res) => {
 }
 
 /**
+ * CREATE new NON payment by userId and subscriptionId
+ * @param req {userId, subscriptionId}
+ * @param res
+ */
+exports.createNonPay = (req, res) => {
+    Subscription.update({billState: 1}, {
+        where: {
+            subscriptionId: req.params.subscriptionId, userId: req.params.userId
+        }
+    }).then(data => {
+        /*
+       [INTEGRATION CODE]
+           //const data = await updateExternalSubscriptionStatus(req.param.subscriptionId, "NO_PAGADO");
+           if (data === 200) res.status(200).send("Pago con estado NO_PAGADO realizado")
+           res.status(400).send("Error al cambiar estado")
+    */
+        try {
+            if (data[0] === 0) {
+                res.status(400).send("Verifique que los datos proporcionados sean válidos")
+            }
+
+            res.status(200).send("Pago con estado NO_PAGADO realizado")
+        } catch (e) {
+            res.status(500).send(e)
+        }
+    }).catch(e => {
+        res.status(500).send(e)
+    });
+}
+
+/**
  * CREATE invoice and change all billState;
  * @param invoice
  * @param subscriptionIDs

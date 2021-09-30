@@ -1,6 +1,6 @@
 const db = require("../models");
 const {Op} = require("sequelize");
-const {sendTestEmail} = require("../services/mailer")
+const {sendRegistrationEmail} = require("../services/mailer")
 const Subscription = db.subscription;
 const User = db.user;
 
@@ -11,12 +11,10 @@ const User = db.user;
  */
 exports.getSubscriptionsByUserId = (req, res) => {
     Subscription.findAll({where: {userId: req.params.userId}})
-      .then(data => {
-          res.status(200).send(data);
-      })
+      .then(data => res.status(200).send(data))
       .catch(err => {
           const response = {
-              data: "Error al obtener facturas",
+              data: "Error al obtener suscripciones",
               message: err.message || "Error",
               status: 500
           }
@@ -65,6 +63,7 @@ exports.createExternalSubscription = async (req, res) => {
                             billState: 1, // 1-PAGADO | 2-DEMORADO | 3-NO_PAGADO
                             subscribed: true
                         });
+                        await sendRegistrationEmail(email, pkg.name);
                     } else {
                         res.status(400).send("Bad registration, the user is already subscribed to those packages.")
                     }
@@ -110,7 +109,10 @@ exports.createInternalSubscription = async (req, res) => {
             billState: 1, // 1-PAGADO | 2-DEMORADO | 3-NO_PAGADO
             subscribed: true
         });
-        await sendTestEmail(email, name);
+        await sendRegistrationEmail(email, name);
+        /*
+        INTEGRATION CODE WITH SUBSCRIPTION MODULE
+         */
         res.status(201).send("Correct registration.");
     } else {
         res.status(400).send("Bad registration, the user is already subscribed to those packages.");

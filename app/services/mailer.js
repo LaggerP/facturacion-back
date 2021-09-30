@@ -5,9 +5,9 @@ const handlebars = require('handlebars');
 const path = require("path");
 
 // async..await is not allowed in global scope, must use a wrapper
-const sendTestEmail = async (email, packageName) => {
+const sendRegistrationEmail = async (email, packageName) => {
 
-    const filePath = path.join(__dirname, './mailTemplates/internalRegistrationTemplate.html');
+    const filePath = path.join(__dirname, './mailTemplates/registrationEmailTemplate.html');
     const source = fs.readFileSync(filePath, 'utf-8').toString();
     const template = handlebars.compile(source);
     const replacements = {
@@ -31,7 +31,7 @@ const sendTestEmail = async (email, packageName) => {
     let info = await transporter.sendMail({
         from: '"no-reply" <notflix.fya@notflix.com>', // sender address
         to: email, // list of receivers
-        subject: "Se realizó suscripción a nuevo paquete", // Subject line
+        subject: "Se realizó una suscripción a nuevo paquete", // Subject line
         attachments: [{
             filename: 'notflixLogo.png',
             path: __dirname +'/notflixLogo.png',
@@ -46,5 +46,5 @@ const sendTestEmail = async (email, packageName) => {
 
 
 module.exports = {
-    sendTestEmail
+    sendRegistrationEmail
 }
