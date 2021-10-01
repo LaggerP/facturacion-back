@@ -1,6 +1,7 @@
 const db = require("../models");
 const {Op} = require("sequelize");
 const {sendRegistrationEmail} = require("../services/mailer")
+const CronJob = require('cron').CronJob;
 const Subscription = db.subscription;
 const User = db.user;
 
@@ -120,34 +121,6 @@ exports.createInternalSubscription = async (req, res) => {
 }
 
 /**
- * DELETE subscription row.
- * [INTEGRATION SUBSCRIPTION MODULE]
- * @param req {userId, subscriptionId, cost}
- * @param res
- */
-exports.deleteSubscription = async (req, res) => {
-    const sub = await Subscription.findAll({
-        where: {
-            userId: req.params.userId,
-            subscriptionId: req.params.subscriptionId
-        }
-    })
-    if (checkDate(sub[0].dataValues.updatedAt)) {
-        const data = await Subscription.destroy({
-            where: {
-                userId: req.params.userId,
-                subscriptionId: req.params.subscriptionId
-            }
-        })
-        if (data !== 0) {
-            res.status(200).send('Subscription successfully removed')
-        } else {
-            res.status(400).send('An error occurred while unsubscribing')
-        }
-    }
-}
-
-/**
  * PATCH Change subscription subscribed status row.
  * [INTEGRATION SUBSCRIPTION MODULE]
  * @param req {userId, subscriptionId}
@@ -177,3 +150,22 @@ const checkDate = (_subDate) => {
     const subDate = new Date(_subDate)
     return actualDay === subDate.getDate();
 }
+
+/**
+ * DELETE subscriptions where subscribed status is false and current day is equals updatedAt date
+ */
+const deleteSubscriptions = new CronJob('0 * * * *', async () => {
+      const subs = await Subscription.findAll({where: {subscribed: false}})
+      for (const sub of subs) {
+          if (checkDate(sub.updatedAt)) {
+              await Subscription.destroy({where: {id: sub.id}})
+          }
+      }
+  }, null, true, 'America/Buenos_Aires');
+
+deleteSubscriptions.start();
+
+
+
+
+

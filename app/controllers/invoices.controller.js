@@ -157,5 +157,5 @@ const checkDate = (_subDate) => {
     const day = date.getDate();
     const month = date.getMonth();
     const subDate = new Date(_subDate)
-    return subDate.getDate()-1 === day && (month - subDate.getMonth()) > 0;
+    return subDate.getDate() - 1 === day && (month - subDate.getMonth()) > 0;
 }
