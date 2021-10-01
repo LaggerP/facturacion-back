@@ -119,3 +119,61 @@ exports.createInternalSubscription = async (req, res) => {
     }
 }
 
+/**
+ * DELETE subscription row.
+ * [INTEGRATION SUBSCRIPTION MODULE]
+ * @param req {userId, subscriptionId, cost}
+ * @param res
+ */
+exports.deleteSubscription = async (req, res) => {
+    const sub = await Subscription.findAll({
+        where: {
+            userId: req.params.userId,
+            subscriptionId: req.params.subscriptionId
+        }
+    })
+    if (checkDate(sub[0].dataValues.updatedAt)) {
+        const data = await Subscription.destroy({
+            where: {
+                userId: req.params.userId,
+                subscriptionId: req.params.subscriptionId
+            }
+        })
+        if (data !== 0) {
+            res.status(200).send('Subscription successfully removed')
+        } else {
+            res.status(400).send('An error occurred while unsubscribing')
+        }
+    }
+}
+
+/**
+ * PATCH Change subscription subscribed status row.
+ * [INTEGRATION SUBSCRIPTION MODULE]
+ * @param req {userId, subscriptionId}
+ * @param res
+ */
+exports.changePreDeleteSubscriptionStatus = async (req, res) => {
+    const data = await Subscription.update({subscribed: false}, {
+        where: {
+            userId: req.params.userId,
+            subscriptionId: req.params.subscriptionId
+        }
+    })
+    if (data !== 0) {
+        res.status(200).send('Subscription successfully updated')
+    } else {
+        res.status(400).send('An error occurred while updated')
+    }
+}
+
+/**
+ * Return TRUE if actual day is under subscription date
+ * @param _subDate
+ */
+const checkDate = (_subDate) => {
+    const date = new Date();
+    const actualDay = date.getDate();
+    const subDate = new Date(_subDate)
+    return actualDay === subDate.getDate();
+}

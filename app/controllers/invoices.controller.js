@@ -55,7 +55,7 @@ exports.getInvoicesById = async (req, res) => {
  * @param res
  */
 exports.createNewPaid = (req, res) => {
-    Subscription.findAll({where: {userId: req.params.userId}})
+    Subscription.findAll({where: {userId: req.params.userId, subscribed: true}})
       .then(async subscriptions => {
           let subscriptionIDs = [];
           if (subscriptions.length !== 0) {
@@ -77,6 +77,7 @@ exports.createNewPaid = (req, res) => {
                       createInvoice = true;
                   }
               })
+
               if (createInvoice) {
                   let status = await createNewInvoice(invoiceData, subscriptionIDs);
                   if (status === 200) res.status(201).send("Invoice was created");
@@ -156,5 +157,5 @@ const checkDate = (_subDate) => {
     const day = date.getDate();
     const month = date.getMonth();
     const subDate = new Date(_subDate)
-    return subDate.getDate() === day && (month - subDate.getMonth()) > 0;
+    return subDate.getDate()-1 === day && (month - subDate.getMonth()) > 0;
 }

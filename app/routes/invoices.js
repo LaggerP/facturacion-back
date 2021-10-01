@@ -13,6 +13,4 @@ router.get("/:userId", invoices.getInvoicesByUserId);
 //GET BILLS BY ID - /api/invoices/<userId>/<billId>
 router.get("/:userId/:billId", invoices.getInvoicesById);
 
-
-
 module.exports = router;

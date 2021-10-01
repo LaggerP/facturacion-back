@@ -10,4 +10,10 @@ router.post('/external/new', subscriptions.createExternalSubscription);
 // [INTEGRATION ENDPOINT] POST SUBSCRIPTION- /api/subscriptions/internal/new
 router.post('/internal/new', subscriptions.createInternalSubscription);
 
+// [INTEGRATION ENDPOINT] DELETE SUBSCRIPTION- /api/subscriptions/:userId/:subscriptionId
+router.delete('/:userId/:subscriptionId', subscriptions.deleteSubscription);
+
+// [INTEGRATION ENDPOINT] CHANGE SUBSCRIPTION STATUS- /api/subscriptions/:userId/:subscriptionId
+router.patch('/:userId/:subscriptionId', subscriptions.changePreDeleteSubscriptionStatus);
+
 module.exports = router;
