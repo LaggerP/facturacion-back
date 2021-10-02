@@ -32,6 +32,7 @@ exports.getSubscriptionsByUserId = (req, res) => {
  */
 exports.createExternalSubscription = async (req, res) => {
     const {userObjectId, firstName, lastName, email, telephone, subscriptionId, packageData} = req.body;
+    let subName = "";
     const exist = await User.findOne({where: {objId: userObjectId}});
     if (exist === null) {
         try {
@@ -64,12 +65,12 @@ exports.createExternalSubscription = async (req, res) => {
                             billState: 1, // 1-PAGADO | 2-DEMORADO | 3-NO_PAGADO
                             subscribed: true
                         });
-                        await sendRegistrationEmail(email, pkg.name);
+                        subName = subName + ', ' + pkg.name
                     } else {
                         res.status(400).send("Bad registration, the user is already subscribed to those packages.")
                     }
                 })
-
+                await sendRegistrationEmail(email, subName);
                 res.status(201).send("Correct registration.")
             }
         } catch (err) {
@@ -155,13 +156,13 @@ const checkDate = (_subDate) => {
  * DELETE subscriptions where subscribed status is false and current day is equals updatedAt date
  */
 const deleteSubscriptions = new CronJob('0 * * * *', async () => {
-      const subs = await Subscription.findAll({where: {subscribed: false}})
-      for (const sub of subs) {
-          if (checkDate(sub.updatedAt)) {
-              await Subscription.destroy({where: {id: sub.id}})
-          }
-      }
-  }, null, true, 'America/Buenos_Aires');
+    const subs = await Subscription.findAll({where: {subscribed: false}})
+    for (const sub of subs) {
+        if (checkDate(sub.updatedAt)) {
+            await Subscription.destroy({where: {id: sub.id}})
+        }
+    }
+}, null, true, 'America/Buenos_Aires');
 
 deleteSubscriptions.start();
 
