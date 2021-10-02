@@ -124,14 +124,16 @@ exports.createInternalSubscription = async (req, res) => {
 /**
  * PATCH Change subscription subscribed status row.
  * [INTEGRATION SUBSCRIPTION MODULE]
- * @param req {userId, subscriptionId}
+ * @param req {userId, subscriptionId, packageId}
  * @param res
  */
 exports.changePreDeleteSubscriptionStatus = async (req, res) => {
+    console.log(req.params)
     const data = await Subscription.update({subscribed: false}, {
         where: {
             userId: req.params.userId,
-            subscriptionId: req.params.subscriptionId
+            subscriptionId: req.params.subscriptionId,
+            packageId: req.params.packageId
         }
     })
     if (data !== 0) {
@@ -152,8 +154,21 @@ const checkDate = (_subDate) => {
     return actualDay === subDate.getDate();
 }
 
+
 /**
- * DELETE subscriptions where subscribed status is false and current day is equals updatedAt date
+ * [INTEGRATION] DELETE package from subscription
+ * @param subscriptionId
+ * @param packageId
+ */
+const deleteExternalSubscriptionPackage = async (subscriptionId, packageId) => {
+    let payload = {"id_suscripcion": subscriptionId, "paquete": packageId}
+    return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/modify/status', payload)
+      .then(async res => res.status)
+      .catch((err) => err.response.status);
+}
+
+/**
+ * DELETE packages where subscribed status is false and current day is equals updatedAt date
  */
 const deleteSubscriptions = new CronJob('0 * * * *', async () => {
     const subs = await Subscription.findAll({where: {subscribed: false}})
