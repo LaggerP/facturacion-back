@@ -9,10 +9,12 @@ const jwt = require('jsonwebtoken');
  */
 const verifyInternalClientToken = async (req, res, next) => {
     const bearer = req.headers.authorization;
+    console.log(req.headers.authorization)
+    console.log(bearer)
     if (bearer === undefined) res.status(400).json({errorMessage: "Provide a valid token"})
     else {
         const bearerToken = bearer[1];
-        if (bearerToken.length === 0) res.status(400).json({errorMessage: "Provide a valid token"});
+        console.log(beabearerTokenrer)
         jwt.verify(bearerToken, process.env.FyA_AUTH_SECRET, (err, decoded) => {
             if (err) res.status(403).json({errorMessage: "Not Authorized"});
             next();
