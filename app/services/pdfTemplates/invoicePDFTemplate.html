@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+        integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Factura</title>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-10 ">
+                <h1>Factura B</h1>
+            </div>
+            <div class="col-xs-2">
+                <img class="img img-responsive" src="https://i.ibb.co/WWXyBCP/notflix-Logo.png" alt="Logotipo">
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-xs-6">
+                <h1 class="h6">Razón Social: Notflix Argentina S.A.</h1>
+                <h1 class="h6">Domicilio: Lima 775, CABA</h1>
+                <h1 class="h6">Condidición IVA: Responsable Inscripto</h1>
+                <h1 class="h6">CUIT: 30-12345678-5</h1>
+                <h1 class="h6">Ingresos Brutos: 30-12345678-5</h1>
+                <h1 class="h6">Inicio Actividades: 01/08/2021</h1>
+            </div>
+            <div class="col-xs-6">
+                <h1 class="h6">Comprobante Nro: {{invoice_number}}</h1>
+                <h1 class="h6">Fecha de emisión: {{invoice_date}}</h1>
+            </div>
+        </div>
+        <hr>
+        <div class="row" style="margin-bottom: 2rem;">
+            <div class="col-xs-12">
+                <h1 class="h6">Cliente: Consumidor final</h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <table class="table table-condensed table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Cantidad</th>
+                            <th>Precio unitario</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{products}}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-right">Subtotal</td>
+                            <td>{{subtotal}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-right">Descuento</td>
+                            <td>{{discount}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-right">Subtotal con descuento</td>
+                            <td>{{subtotalWithDiscount}}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-right">
+                                <h4>Total</h4>
+                            </td>
+                            <td>
+                                <h4>{{total}}</h4>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 text-center">
+                <p class="h5">Gracias por su compra</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

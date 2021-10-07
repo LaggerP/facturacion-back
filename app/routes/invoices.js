@@ -14,4 +14,7 @@ router.get("/:userId", verifyInternalClientToken, invoices.getInvoicesByUserId);
 //GET BILLS BY ID - /api/invoices/<userId>/<billId>
 router.get("/:userId/:billId", verifyInternalClientToken, invoices.getInvoicesById);
 
+//GET PDF BILLS BY ID - /api/invoices/pdf/<userId>/<billId>
+router.get("/pdf/:userId/:billId", verifyInternalClientToken, invoices.getPDFInvoice);
+
 module.exports = router;
