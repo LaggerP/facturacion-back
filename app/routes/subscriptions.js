@@ -11,7 +11,7 @@ router.post('/external/new', verifyInternalClientToken, subscriptions.createExte
 // [INTEGRATION ENDPOINT] POST SUBSCRIPTION- /api/subscriptions/internal/new
 router.post('/internal/new', verifyInternalClientToken, subscriptions.createInternalSubscription);
 
-// [INTEGRATION ENDPOINT] CHANGE SUBSCRIPTION STATUS- /api/subscriptions/:userId/:subscriptionId
+// [INTEGRATION ENDPOINT] CHANGE SUBSCRIPTION STATUS- /api/subscriptions/:userId/:subscriptionId/:packageId
 router.patch('/:userId/:subscriptionId/:packageId',  subscriptions.changePreDeleteSubscriptionStatus);
 
 module.exports = router;

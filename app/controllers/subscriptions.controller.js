@@ -1,4 +1,5 @@
 const db = require("../models");
+const axios = require("axios");
 const {Op} = require("sequelize");
 const {sendRegistrationEmail} = require("../services/mailer")
 const CronJob = require('cron').CronJob;
@@ -128,7 +129,6 @@ exports.createInternalSubscription = async (req, res) => {
  * @param res
  */
 exports.changePreDeleteSubscriptionStatus = async (req, res) => {
-    console.log(req.params)
     const data = await Subscription.update({subscribed: false}, {
         where: {
             userId: req.params.userId,
@@ -156,13 +156,14 @@ const checkDate = (_subDate) => {
 
 
 /**
- * [INTEGRATION] DELETE package from subscription
+ * DELETE package from subscription
+ * [INTEGRATION SUBSCRIPTION MODULE]
  * @param subscriptionId
  * @param packageId
  */
 const deleteExternalSubscriptionPackage = async (subscriptionId, packageId) => {
     let payload = {"id_suscripcion": subscriptionId, "paquete": packageId}
-    return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/modify/status', payload)
+    return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/remove/pack', payload)
       .then(async res => res.status)
       .catch((err) => err.response.status);
 }
@@ -175,6 +176,8 @@ const deleteSubscriptions = new CronJob('0 * * * *', async () => {
     for (const sub of subs) {
         if (checkDate(sub.updatedAt)) {
             await Subscription.destroy({where: {id: sub.id}})
+            //INTEGRATION CODE - DELETE IFS NECESSARY
+            //await deleteExternalSubscriptionPackage(sub.subscriptionId, sub.packageId);
         }
     }
 }, null, true, 'America/Buenos_Aires');
