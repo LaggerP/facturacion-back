@@ -6,10 +6,10 @@ const {verifyInternalClientToken} = require('../auth/authorization');
 router.get('/:userId',  verifyInternalClientToken, subscriptions.getSubscriptionsByUserId);
 
 // POST SUBSCRIPTION- /api/subscriptions/external/new
-router.post('/external/new', verifyInternalClientToken, subscriptions.createExternalSubscription);
+router.post('/external/new', subscriptions.createExternalSubscription);
 
 // [INTEGRATION ENDPOINT] POST SUBSCRIPTION- /api/subscriptions/internal/new
-router.post('/internal/new', verifyInternalClientToken, subscriptions.createInternalSubscription);
+router.post('/internal/new',  subscriptions.createInternalSubscription);
 
 // [INTEGRATION ENDPOINT] CHANGE SUBSCRIPTION STATUS- /api/subscriptions/:userId/:subscriptionId/:packageId
 router.patch('/:userId/:subscriptionId/:packageId',  verifyInternalClientToken, subscriptions.changePreDeleteSubscriptionStatus);

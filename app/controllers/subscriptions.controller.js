@@ -90,7 +90,7 @@ exports.createExternalSubscription = async (req, res) => {
  * @param res
  */
 exports.createInternalSubscription = async (req, res) => {
-    const {userId, email, name, subscriptionId, packageId, cost} = req.body;
+    const {userId, email, name, subscriptionId, packageId, cost, firstName, lastName, telephone} = req.body;
 
     //Check if user was already subscribed to package.
     const existingPackage = await Subscription.findOne({
@@ -112,11 +112,20 @@ exports.createInternalSubscription = async (req, res) => {
             billState: 1, // 1-PAGADO | 2-DEMORADO | 3-NO_PAGADO
             subscribed: true
         });
-        await sendRegistrationEmail(email, name);
-        /*
-        INTEGRATION CODE WITH SUBSCRIPTION MODULE
-         */
-        res.status(201).send("Correct registration.");
+        const regStatus = await createExternalModuleSubscription({
+            id_usuario: userId,
+            paquetes: [packageId],
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            telephone: telephone
+        })
+        if (regStatus === 201){
+            await sendRegistrationEmail(email, name);
+            res.status(201).send("Correct registration.");
+        } else if (regStatus === 500) {
+            res.status(500).send("Internal Server Error - Bad SUBSCRIPTION MODULE registration.");
+        }
     } else {
         res.status(400).send("Bad registration, the user is already subscribed to those packages.");
     }
@@ -155,14 +164,20 @@ const checkDate = (_subDate) => {
 }
 
 
+const createExternalModuleSubscription = async (payload) => {
+    return await axios.post('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/create', payload)
+      .then(async res => {
+          return res.status
+      })
+      .catch((err) => err.response.status);
+}
+
 /**
  * DELETE package from subscription
  * [INTEGRATION SUBSCRIPTION MODULE]
- * @param subscriptionId
- * @param packageId
+ * @param payload
  */
-const deleteExternalSubscriptionPackage = async (subscriptionId, packageId) => {
-    let payload = {"id_suscripcion": subscriptionId, "paquete": packageId}
+const deleteExternalSubscriptionPackage = async (payload) => {
     return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/remove/pack', payload)
       .then(async res => res.status)
       .catch((err) => err.response.status);
@@ -177,7 +192,7 @@ const deleteSubscriptions = new CronJob('0 * * * *', async () => {
         if (checkDate(sub.updatedAt)) {
             await Subscription.destroy({where: {id: sub.id}})
             //INTEGRATION CODE - DELETE IFS NECESSARY
-            //await deleteExternalSubscriptionPackage(sub.subscriptionId, sub.packageId);
+            //await deleteExternalSubscriptionPackage({id_suscripcion: sub.subscriptionId, paquete: sub.packageId});
         }
     }
 }, null, true, 'America/Buenos_Aires');
