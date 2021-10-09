@@ -4,6 +4,8 @@ const axios = require("axios");
 
 const Invoice = db.invoice;
 const Subscription = db.subscription;
+const {createPDFInvoice} = require("../services/pdf")
+
 
 /**
  * GET all Invoices by UserId
@@ -117,6 +119,36 @@ exports.createNonPay = (req, res) => {
     }).catch(e => {
         res.status(500).send(e)
     });
+}
+
+/**
+ * CREATE new NON payment by userId and subscriptionId
+ * @param req {userId, subscriptionId}
+ * @param res
+ */
+ exports.getPDFInvoice = (req, res) => {
+    Invoice.findOne({
+        where: {
+            userId: req.params.userId,
+            id: req.params.billId
+        }
+    })
+        .then(data => {
+            if(data !== null){
+                //Generate PDF
+                createPDFInvoice(res, data);
+            }else{
+                throw "Factura no encontrada";
+            }
+        })
+        .catch(err => {
+            const response = {
+                data: "Factura no encontrada",
+                message: err || "Error",
+                status: 500
+            }
+            res.status(500).send(response);
+        });       
 }
 
 /**
