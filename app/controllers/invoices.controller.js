@@ -5,6 +5,7 @@ const axios = require("axios");
 const Invoice = db.invoice;
 const Subscription = db.subscription;
 const {createPDFInvoice} = require("../services/pdf")
+const {sendNewInvoiceEmail} = require("../services/mailer")
 
 
 /**
@@ -52,8 +53,8 @@ exports.getInvoicesById = async (req, res) => {
 }
 
 /**
- * CREATE new payment by userId
- * @param req {userId}
+ * CREATE new payment by userId and email
+ * @param req {userId, email}
  * @param res
  */
 exports.createNewPaid = (req, res) => {
@@ -81,8 +82,12 @@ exports.createNewPaid = (req, res) => {
               })
 
               if (createInvoice) {
+                  invoiceData.description = invoiceData.description.slice(0, -1) //delete final coma
                   let status = await createNewInvoice(invoiceData, subscriptionIDs);
-                  if (status === 200) res.status(201).send("Invoice was created");
+                  if (status === 200) {
+                      await sendNewInvoiceEmail(req.body.email, invoiceData.description, invoiceData.invoiceNumber)
+                      res.status(201).send("Invoice was created");
+                  }
                   else res.status(400).send("The subscription to modify doesn't exist [module subs]")
               } else res.status(202).send("There are no subscriptions to create an invoice.");
           } else throw "Cannot create invoice because userId doesn't exist"
@@ -122,8 +127,8 @@ exports.createNonPay = (req, res) => {
 }
 
 /**
- * CREATE new NON payment by userId and subscriptionId
- * @param req {userId, subscriptionId}
+ * CREATE new pdf Invoice
+ * @param req {userId, billId}
  * @param res
  */
  exports.getPDFInvoice = (req, res) => {
@@ -133,10 +138,10 @@ exports.createNonPay = (req, res) => {
             id: req.params.billId
         }
     })
-        .then(data => {
+        .then(async data => {
             if(data !== null){
                 //Generate PDF
-                createPDFInvoice(res, data);
+                await createPDFInvoice(res, data);
             }else{
                 throw "Factura no encontrada";
             }
@@ -148,7 +153,7 @@ exports.createNonPay = (req, res) => {
                 status: 500
             }
             res.status(500).send(response);
-        });       
+        });
 }
 
 /**
@@ -189,5 +194,5 @@ const checkDate = (_subDate) => {
     const day = date.getDate();
     const month = date.getMonth();
     const subDate = new Date(_subDate)
-    return subDate.getDate() - 1 === day && (month - subDate.getMonth()) > 0;
+    return subDate.getDate() === day && (month - subDate.getMonth()) > 0;
 }

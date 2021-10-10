@@ -68,7 +68,6 @@ function zfill(number, width) {
     }
 }
 
-
 module.exports = {
     createPDFInvoice
 }

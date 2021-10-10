@@ -64,7 +64,8 @@ exports.createExternalSubscription = async (req, res) => {
                             packageId: pkg.id,
                             cost: pkg.price,
                             billState: 1, // 1-PAGADO | 2-DEMORADO | 3-NO_PAGADO
-                            subscribed: true
+                            subscribed: true,
+                            uriImg: pkg.uriImg
                         });
                         subName = subName + ', ' + pkg.name
                     } else {
