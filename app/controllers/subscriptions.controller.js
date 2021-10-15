@@ -115,7 +115,7 @@ exports.createInternalSubscription = async (req, res) => {
             uriImg: uriImg
         });
         const regStatus = await createExternalModuleSubscription({
-            id_usuario: userId,
+            id_usuario: `${userId}`,
             paquetes: [packageId],
             firstName: firstName,
             lastName: lastName,
