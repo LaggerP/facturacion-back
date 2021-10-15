@@ -194,7 +194,7 @@ const deleteSubscriptions = new CronJob('0 * * * *', async () => {
         if (checkDate(sub.updatedAt)) {
             await Subscription.destroy({where: {id: sub.id}})
             //INTEGRATION CODE - DELETE IFS NECESSARY
-            //await deleteExternalSubscriptionPackage({id_suscripcion: sub.subscriptionId, paquete: sub.packageId});
+            await deleteExternalSubscriptionPackage({id_suscripcion: sub.subscriptionId, paquete: sub.packageId});
         }
     }
 }, null, true, 'America/Buenos_Aires');
