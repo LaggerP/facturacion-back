@@ -91,7 +91,7 @@ exports.createExternalSubscription = async (req, res) => {
  * @param res
  */
 exports.createInternalSubscription = async (req, res) => {
-    const {userId, email, name, subscriptionId, packageId, cost, firstName, lastName, telephone, uriImg} = req.body;
+    const {userId, userObjectId, email, name, subscriptionId, packageId, cost, firstName, lastName, telephone, uriImg} = req.body;
 
     //Check if user was already subscribed to package.
     const existingPackage = await Subscription.findOne({
@@ -115,7 +115,7 @@ exports.createInternalSubscription = async (req, res) => {
             uriImg: uriImg
         });
         const regStatus = await createExternalModuleSubscription({
-            id_usuario: `${userId}`,
+            id_usuario: userObjectId,
             paquetes: [packageId],
             firstName: firstName,
             lastName: lastName,
