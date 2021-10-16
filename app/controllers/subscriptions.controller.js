@@ -91,7 +91,19 @@ exports.createExternalSubscription = async (req, res) => {
  * @param res
  */
 exports.createInternalSubscription = async (req, res) => {
-    const {userId, userObjectId, email, name, subscriptionId, packageId, cost, firstName, lastName, telephone, uriImg} = req.body;
+    const {
+        userId,
+        userObjectId,
+        email,
+        name,
+        subscriptionId,
+        packageId,
+        cost,
+        firstName,
+        lastName,
+        telephone,
+        uriImg
+    } = req.body;
 
     //Check if user was already subscribed to package.
     const existingPackage = await Subscription.findOne({
@@ -122,7 +134,7 @@ exports.createInternalSubscription = async (req, res) => {
             email: email,
             telephone: telephone
         })
-        if (regStatus === 201){
+        if (regStatus === 201) {
             await sendRegistrationEmail(email, name);
             res.status(201).send("Correct registration.");
         } else if (regStatus === 500) {
@@ -158,11 +170,23 @@ exports.changePreDeleteSubscriptionStatus = async (req, res) => {
  * Return TRUE if actual day is under subscription date
  * @param _subDate
  */
-const checkDate = (_subDate) => {
+const checkDateUnsubscribed = (_subDate) => {
     const date = new Date();
     const actualDay = date.getDate();
     const subDate = new Date(_subDate)
     return actualDay === subDate.getDate();
+}
+
+/**
+ * Returns true if there are 7 days difference
+ * @param _subDate
+ */
+const checkDateNonPaid = (_subDate) => {
+    const date = new Date();
+    const differenceInTime = _subDate.getTime() - date.getTime();
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24);
+    differenceInDays.toFixed() //Elimino decimales
+    return differenceInDays === 7 || -7
 }
 
 
@@ -187,14 +211,24 @@ const deleteExternalSubscriptionPackage = async (payload) => {
 
 /**
  * DELETE packages where subscribed status is false and current day is equals updatedAt date
+ * 10 * * * * - AT MINUTE 10 (00:10, 01:10, 02:10...)
  */
-const deleteSubscriptions = new CronJob('0 * * * *', async () => {
+const deleteSubscriptions = new CronJob('10 * * * *', async () => {
+    console.log("SE CORRE CRON DE ELIMINACIÓN")
     const subs = await Subscription.findAll({where: {subscribed: false}})
     for (const sub of subs) {
-        if (checkDate(sub.updatedAt)) {
+        if (checkDateUnsubscribed(sub.updatedAt)) {
             await Subscription.destroy({where: {id: sub.id}})
-            //INTEGRATION CODE - DELETE IFS NECESSARY
             await deleteExternalSubscriptionPackage({id_suscripcion: sub.subscriptionId, paquete: sub.packageId});
+            console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - SUBSCRIBED FALSE`)
+        }
+    }
+    const subs2 = await Subscription.findAll({where: {billState: 2}})
+    for (const sub of subs2) {
+        if (checkDateNonPaid(sub.updatedAt)) {
+            await Subscription.destroy({where: {id: sub.id}})
+            await deleteExternalSubscriptionPackage({id_suscripcion: sub.subscriptionId, paquete: sub.packageId});
+            console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - BILL STATE DEMORADO`)
         }
     }
 }, null, true, 'America/Buenos_Aires');
