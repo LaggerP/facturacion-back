@@ -5,7 +5,7 @@ const axios = require("axios");
 const Invoice = db.invoice;
 const Subscription = db.subscription;
 const {createPDFInvoice} = require("../services/pdf")
-const {sendNewInvoiceEmail} = require("../services/mailer")
+const {sendNewInvoiceEmail, sendNonPaidEmail} = require("../services/mailer")
 
 
 /**
@@ -87,8 +87,7 @@ exports.createNewPaid = (req, res) => {
                   if (status === 200) {
                       await sendNewInvoiceEmail(req.body.email, invoiceData.description, invoiceData.invoiceNumber)
                       res.status(201).send("Invoice was created");
-                  }
-                  else res.status(400).send("The subscription to modify doesn't exist [module subs]")
+                  } else res.status(400).send("The subscription to modify doesn't exist [module subs]")
               } else res.status(202).send("There are no subscriptions to create an invoice.");
           } else throw "Cannot create invoice because userId doesn't exist"
       })
@@ -100,30 +99,29 @@ exports.createNewPaid = (req, res) => {
  * @param req {userId, subscriptionId}
  * @param res
  */
-exports.createNonPay = (req, res) => {
-    Subscription.update({billState: 1}, {
-        where: {
-            subscriptionId: req.params.subscriptionId, userId: req.params.userId
-        }
-    }).then(data => {
-        /*
-       [INTEGRATION CODE]
-           //const data = await updateExternalSubscriptionStatus(req.param.subscriptionId, "NO_PAGADO");
-           if (data === 200) res.status(200).send("Pago con estado NO_PAGADO realizado")
-           res.status(400).send("Error al cambiar estado")
-    */
-        try {
-            if (data[0] === 0) {
-                res.status(400).send("Verifique que los datos proporcionados sean válidos")
-            }
+exports.createNonPay = async (req, res) => {
+    try {
+        //billState: 2 (DEMORADO)
+        const updatedState = await Subscription.update({billState: 2}, {
+            where: {subscriptionId: req.params.subscriptionId, userId: req.params.userId}
+        });
 
-            res.status(200).send("Pago con estado NO_PAGADO realizado")
-        } catch (e) {
-            res.status(500).send(e)
+        if (updatedState[0] !== 0) {
+            const externalUpdated = await updateExternalSubscriptionStatus(req.params.subscriptionId, "DEMORADO");
+            if (externalUpdated === 200) {
+                await sendNonPaidEmail(req.body.email);
+                res.status(200).send("Pago con estado DEMORADO realizado");
+            } else if (externalUpdated === 400) {
+                res.status(400).send("SUBSCRIPTION MODULE - La subscriptionId" +
+                  " brindada no existe en el módulo de" +
+                  " suscripciones");
+            } else res.status(500).send("SUBSCRIPTION MODULE - Server error");
+        } else {
+            res.status(400).send("Verifique que los datos proporcionados sean válidos");
         }
-    }).catch(e => {
-        res.status(500).send(e)
-    });
+    } catch (error) {
+        res.status(500).send("Server FyA error")
+    }
 }
 
 /**
@@ -131,29 +129,29 @@ exports.createNonPay = (req, res) => {
  * @param req {userId, billId}
  * @param res
  */
- exports.getPDFInvoice = (req, res) => {
+exports.getPDFInvoice = (req, res) => {
     Invoice.findOne({
         where: {
             userId: req.params.userId,
             id: req.params.billId
         }
     })
-        .then(async data => {
-            if(data !== null){
-                //Generate PDF
-                await createPDFInvoice(res, data);
-            }else{
-                throw "Factura no encontrada";
-            }
-        })
-        .catch(err => {
-            const response = {
-                data: "Factura no encontrada",
-                message: err || "Error",
-                status: 500
-            }
-            res.status(500).send(response);
-        });
+      .then(async data => {
+          if (data !== null) {
+              //Generate PDF
+              await createPDFInvoice(res, data);
+          } else {
+              throw "Factura no encontrada";
+          }
+      })
+      .catch(err => {
+          const response = {
+              data: "Factura no encontrada",
+              message: err || "Error",
+              status: 500
+          }
+          res.status(500).send(response);
+      });
 }
 
 /**
