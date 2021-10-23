@@ -116,7 +116,7 @@ exports.createInternalSubscription = async (req, res) => {
     })
 
     if (existingPackage === null) {
-        await Subscription.create({
+        const newSubscription = await Subscription.create({
             userId: userId,
             name: name,
             subscriptionId: subscriptionId,
@@ -137,7 +137,11 @@ exports.createInternalSubscription = async (req, res) => {
         if (regStatus === 201) {
             await sendRegistrationEmail(email, name);
             res.status(201).send("Correct registration.");
+        } else if (regStatus === 400) {
+            await newSubscription.destroy();
+            res.status(400).send("The user has already been subscribed - Bad SUBSCRIPTION MODULE registration.");
         } else if (regStatus === 500) {
+            await newSubscription.destroy();
             res.status(500).send("Internal Server Error - Bad SUBSCRIPTION MODULE registration.");
         }
     } else {
@@ -191,11 +195,12 @@ const checkDateNonPaid = (_subDate) => {
 
 
 const createExternalModuleSubscription = async (payload) => {
-    return await axios.post('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/create', payload)
-      .then(async res => {
-          return res.status
-      })
-      .catch((err) => err.response.status);
+    try {
+        let response = await axios.post('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/create', payload);
+        return response.status
+    } catch (err) {
+        return err.response.status
+    }
 }
 
 /**
