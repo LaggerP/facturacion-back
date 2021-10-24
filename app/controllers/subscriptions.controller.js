@@ -127,19 +127,15 @@ exports.createInternalSubscription = async (req, res) => {
             uriImg: uriImg
         });
         const regStatus = await createExternalModuleSubscription({
-            id_usuario: userObjectId,
-            paquetes: [packageId],
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            telephone: telephone
+            id_suscripcion: subscriptionId,
+            paquete: packageId,
         })
-        if (regStatus === 201) {
+        if (regStatus === 200) {
             await sendRegistrationEmail(email, name);
-            res.status(201).send("Correct registration.");
+            res.status(201).send("Subscription updated successfully");
         } else if (regStatus === 400) {
             await newSubscription.destroy();
-            res.status(400).send("The user has already been subscribed - Bad SUBSCRIPTION MODULE registration.");
+            res.status(400).send("The subscription to modify doesn't exist - Bad SUBSCRIPTION MODULE registration.");
         } else if (regStatus === 500) {
             await newSubscription.destroy();
             res.status(500).send("Internal Server Error - Bad SUBSCRIPTION MODULE registration.");
@@ -196,7 +192,7 @@ const checkDateNonPaid = (_subDate) => {
 
 const createExternalModuleSubscription = async (payload) => {
     try {
-        let response = await axios.post('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/create', payload);
+        let response = await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/add/pack', payload);
         return response.status
     } catch (err) {
         return err.response.status
@@ -209,9 +205,12 @@ const createExternalModuleSubscription = async (payload) => {
  * @param payload
  */
 const deleteExternalSubscriptionPackage = async (payload) => {
-    return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/remove/pack', payload)
-      .then(async res => res.status)
-      .catch((err) => err.response.status);
+    try {
+        let response = await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/remove/pack', payload);
+        return response.status
+    } catch (err) {
+        return err.response.status
+    }
 }
 
 /**
@@ -223,17 +222,32 @@ const deleteSubscriptions = new CronJob('10 * * * *', async () => {
     const subs = await Subscription.findAll({where: {subscribed: false}})
     for (const sub of subs) {
         if (checkDateUnsubscribed(sub.updatedAt)) {
-            await Subscription.destroy({where: {id: sub.id}})
-            await deleteExternalSubscriptionPackage({id_suscripcion: sub.subscriptionId, paquete: sub.packageId});
-            console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - SUBSCRIBED FALSE`)
+            const externalDeleted = await deleteExternalSubscriptionPackage({
+                id_suscripcion: sub.subscriptionId,
+                paquete: sub.packageId
+            });
+            if (externalDeleted === 200) {
+                await Subscription.destroy({where: {id: sub.id}})
+                console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - SUBSCRIBED FALSE`)
+            } else {
+                console.log(`STATUS: ${externalDeleted} - BILL STATE DEMORADO`)
+            }
         }
     }
     const subs2 = await Subscription.findAll({where: {billState: 2}})
     for (const sub of subs2) {
         if (checkDateNonPaid(sub.updatedAt)) {
-            await Subscription.destroy({where: {id: sub.id}})
-            await deleteExternalSubscriptionPackage({id_suscripcion: sub.subscriptionId, paquete: sub.packageId});
-            console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - BILL STATE DEMORADO`)
+            const externalDeleted = await deleteExternalSubscriptionPackage({
+                id_suscripcion: sub.subscriptionId,
+                paquete: sub.packageId
+            });
+            if (externalDeleted === 200) {
+                await Subscription.destroy({where: {id: sub.id}})
+                console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - BILL STATE DEMORADO`)
+            } else {
+                console.log(`STATUS: ${externalDeleted} - BILL STATE DEMORADO`)
+
+            }
         }
     }
 }, null, true, 'America/Buenos_Aires');
