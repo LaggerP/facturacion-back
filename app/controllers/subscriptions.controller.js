@@ -230,7 +230,7 @@ const deleteSubscriptions = new CronJob('10 * * * *', async () => {
                 await Subscription.destroy({where: {id: sub.id}})
                 console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - SUBSCRIBED FALSE`)
             } else {
-                console.log(`STATUS: ${externalDeleted} - BILL STATE DEMORADO`)
+                console.log(`STATUS: ${externalDeleted} MESSAGE: The package to remove doesn't exist in the given subscription - SUBSCRIBED FALSE`)
             }
         }
     }
@@ -245,7 +245,7 @@ const deleteSubscriptions = new CronJob('10 * * * *', async () => {
                 await Subscription.destroy({where: {id: sub.id}})
                 console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - BILL STATE DEMORADO`)
             } else {
-                console.log(`STATUS: ${externalDeleted} - BILL STATE DEMORADO`)
+                console.log(`STATUS: ${externalDeleted} MESSAGE: The package to remove doesn't exist in the given subscription - BILL STATE DEMORADO`)
 
             }
         }
