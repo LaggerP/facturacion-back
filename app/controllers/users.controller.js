@@ -10,7 +10,7 @@ const Invoice = db.invoice;
  * @param res
  */
 exports.getUserData = (req, res) => {
-    User.findOne({where: {objId: req.body.clientData.objectId}})
+    User.findOne({where: {objId: req.body.clientData._id}})
       .then(async data => {
           const packages = await Subscription.findAll({where: {userId: data.id}});
           const lastInvoice = await Invoice.findOne({
