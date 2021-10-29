@@ -1,9 +1,8 @@
 const axios = require("axios");
 
-const wakeUpDyno = (url, interval = 25, callback) => {
+const wakeUpDyno = (url, interval = 29, callback) => {
     const milliseconds = interval * 60000;
     setTimeout(async () => {
-
         try {
             console.log(`setTimeout called.`);
             // HTTP GET request to the dyno's url
@@ -14,7 +13,6 @@ const wakeUpDyno = (url, interval = 25, callback) => {
             Will try again in ${interval} minutes...`);
         }
         finally {
-
             try {
                 callback(); // execute callback, if passed
             }
@@ -25,9 +23,7 @@ const wakeUpDyno = (url, interval = 25, callback) => {
                 // do it all again
                 return wakeUpDyno(url, interval, callback);
             }
-
         }
-
     }, milliseconds);
 };
 

@@ -1,5 +1,7 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken');
+const fs = require("fs");
+const PUBLIC_KEY = fs.readFileSync(__dirname + '/jwtPublic.key');
 
 /**
  * Checks if token from FyA app is valid.
@@ -28,8 +30,7 @@ const verifyInternalClientToken = async (req, res, next) => {
 const verifyExternalClientToken = async (req, res, next) => {
     let {token, from} = req.params;
     if (token.length === 0) res.status(400).json({errorMessage: "Provide a valid token "});
-    const secretKey = from === "web" ? process.env.SECRET_WEB_JWT : process.env.SECRET_MOBILE_JWT;
-    jwt.verify(token, secretKey, (err, decoded) => {
+    jwt.verify(token, PUBLIC_KEY, (err, decoded) => {
         if (err) res.status(403).json({errorMessage: "Not Authorized"});
         req.body.clientData = decoded;
         next();

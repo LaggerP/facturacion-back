@@ -178,7 +178,8 @@ const createNewInvoice = async (invoice, subscriptionIDs) => {
  */
 const updateExternalSubscriptionStatus = async (subscriptionId, state) => {
     let payload = {"id_suscripcion": subscriptionId, "estado": state}
-    return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/modify/status', payload)
+    let headers = {'X-Auth-Key': process.env.SECRET_SUBSCRIPTIONS_KEY}
+    return await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/modify/status', payload, {headers:headers})
       .then(async res => res.status)
       .catch((err) => err.response.status);
 }

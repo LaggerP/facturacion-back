@@ -191,8 +191,9 @@ const checkDateNonPaid = (_subDate) => {
 
 
 const createExternalModuleSubscription = async (payload) => {
+    let headers = {'X-Auth-Key': process.env.SECRET_SUBSCRIPTIONS_KEY}
     try {
-        let response = await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/add/pack', payload);
+        let response = await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/add/pack', payload, {headers: headers});
         return response.status
     } catch (err) {
         return err.response.status
@@ -205,8 +206,9 @@ const createExternalModuleSubscription = async (payload) => {
  * @param payload
  */
 const deleteExternalSubscriptionPackage = async (payload) => {
+    let headers = {'X-Auth-Key': process.env.SECRET_SUBSCRIPTIONS_KEY}
     try {
-        let response = await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/remove/pack', payload);
+        let response = await axios.put('https://suscripciones-backend.herokuapp.com/api/subscriptions/v1/remove/pack', payload, {headers: headers});
         return response.status
     } catch (err) {
         return err.response.status
@@ -246,7 +248,6 @@ const deleteSubscriptions = new CronJob('10 * * * *', async () => {
                 console.log(`SE ELIMINÓ PAQUETE ${sub.packageId} de la SUBSCRIPCIÓN ${sub.subscriptionId} - BILL STATE DEMORADO`)
             } else {
                 console.log(`STATUS: ${externalDeleted} MESSAGE: The package to remove doesn't exist in the given subscription - BILL STATE DEMORADO`)
-
             }
         }
     }
