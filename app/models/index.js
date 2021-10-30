@@ -2,7 +2,7 @@ const dbConfig = require('../config/db.config.js');
 
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize(dbConfig.DB_URI, {
+const sequelize = new Sequelize(dbConfig.DATABASE_URL, {
   dialect: dbConfig.dialect,
   protocol: dbConfig.protocol,
   dialectOptions: {

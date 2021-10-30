@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 module.exports = {
-    DB_URI: process.env.DEV === "true" ? process.env.DEV_DB_URI : process.env.PROD_DB_URI,
+    DATABASE_URL: process.env.DEV === "true" ? process.env.DEV_DATABASE_URL : process.env.DATABASE_URL,
     dialect: 'postgres',
     protocol: 'postgres',
     pool: {
