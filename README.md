@@ -29,11 +29,7 @@ Crear un archivo `.env` con las siguientes variables de entorno:
  FyA_EMAIL_SMTP=tuSMTP
  SECRET_SSO_FyA_JWT=tokenSuministradoPorSSO
  SECRET_SUBSCRIPTIONS_KEY=keySecretaDeSuscripciones
- DEV_DB_HOST=localhost
- PROD_DB_PORT=3306
- DEV_DB_USER=tu_DB_local_USER
- DEV_DB_PASS=tu_DB_local_PASS
- DEV_DB_DB=tu_DB_local_DB
+ DEV_DB_URI=tu_DB_URI_local_Postgres
 ```
 
 ___
