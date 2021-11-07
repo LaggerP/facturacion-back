@@ -136,22 +136,37 @@ exports.getPDFInvoice = (req, res) => {
             id: req.params.billId
         }
     })
-      .then(async data => {
-          if (data !== null) {
-              //Generate PDF
-              await createPDFInvoice(res, data);
-          } else {
-              throw "Factura no encontrada";
-          }
-      })
-      .catch(err => {
-          const response = {
-              data: "Factura no encontrada",
-              message: err || "Error",
-              status: 500
-          }
-          res.status(500).send(response);
-      });
+        .then(async data => {
+            if (data !== null) {
+                Subscription.findAll({where: {userId: req.params.userId, subscribed: true}})
+                    .then(async subscriptions => {
+                        if(subscriptions !== null){
+                            //Generate PDF
+                            await createPDFInvoice(res, data, subscriptions);
+                        }else{
+                            throw "Factura no encontrada";
+                        }
+                    })
+                    .catch(err => {
+                        const response = {
+                            data: "Error al obtener suscripciones",
+                            message: err.message || "Error",
+                            status: 500
+                        }
+                        res.status(500).send(response);
+                    });
+            } else {
+                throw "Factura no encontrada";
+            }
+        })
+        .catch(err => {
+            const response = {
+                data: "Factura no encontrada",
+                message: err || "Error",
+                status: 500
+            }
+            res.status(500).send(response);
+        });
 }
 
 /**
