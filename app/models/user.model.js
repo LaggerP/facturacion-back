@@ -10,6 +10,9 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,
             unique: true
         },
+        subscriptionId: {
+            type: Sequelize.INTEGER,
+        },
         email: {
             type: Sequelize.STRING,
             allowNull: false,

@@ -42,7 +42,8 @@ exports.createExternalSubscription = async (req, res) => {
                 firstName: firstName,
                 lastName: lastName,
                 email: email,
-                phoneNumber: telephone
+                phoneNumber: telephone,
+                subscriptionId: subscriptionId
             })
 
             if (newUser !== null) {
