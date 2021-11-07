@@ -1,7 +1,7 @@
 const pdf = require("html-pdf");
 const fs = require("fs");
 
-const createPDFInvoice = async (res, data) => {
+const createPDFInvoice = async (res, data, products) => {
     const filePath = require.resolve('./pdfTemplates/invoicePDFTemplate.html');
     let html = fs.readFileSync(filePath, 'utf8')
 
@@ -15,13 +15,15 @@ const createPDFInvoice = async (res, data) => {
 
     let subtotal = data.totalAmount;
 
-    table += `<tr>
-    <td>${data.description}</td>
-    <td>1</td>
-    <td>${formatter.format(data.totalAmount)}</td>
-    <td>${formatter.format(data.totalAmount)}</td>
-    </tr>`;
-
+    for(p of products){
+        table += `<tr>
+        <td>${p.name}</td>
+        <td>1</td>
+        <td>${formatter.format(p.cost)}</td>
+        <td>${formatter.format(p.cost)}</td>
+        </tr>`;
+    }
+    
     const discount = 0;
     const subtotalWithDiscount = subtotal - discount;
     const total = subtotalWithDiscount;
