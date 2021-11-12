@@ -220,7 +220,7 @@ const deleteExternalSubscriptionPackage = async (payload) => {
  * DELETE packages where subscribed status is false and current day is equals updatedAt date
  * 10 * * * * - AT MINUTE 10 (00:10, 01:10, 02:10...)
  */
-const deleteSubscriptions = new CronJob('10 * * * *', async () => {
+const deleteSubscriptions = new CronJob('*/1 * * * *', async () => {
     console.log("SE CORRE CRON DE ELIMINACIÓN")
     const subs = await Subscription.findAll({where: {subscribed: false}})
     for (const sub of subs) {
