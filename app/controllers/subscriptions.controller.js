@@ -117,7 +117,7 @@ exports.createInternalSubscription = async (req, res) => {
     })
 
     if (existingPackage === null) {
-        const newSubscription = await Subscription.create({
+        let newSub = {
             userId: userId,
             name: name,
             subscriptionId: subscriptionId,
@@ -126,14 +126,15 @@ exports.createInternalSubscription = async (req, res) => {
             billState: 1, // 1-PAGADO | 2-DEMORADO | 3-NO_PAGADO
             subscribed: true,
             uriImg: uriImg
-        });
+        };
+        const newSubscription = await Subscription.create(newSub);
         const regStatus = await createExternalModuleSubscription({
             id_suscripcion: subscriptionId,
             paquete: packageId,
         })
         if (regStatus === 200) {
             await sendRegistrationEmail(email, name);
-            res.status(201).send("Subscription updated successfully");
+            res.status(201).json({msg:"Subscription updated successfully", sub:newSub});
         } else if (regStatus === 400) {
             await newSubscription.destroy();
             res.status(400).send("The subscription to modify doesn't exist - Bad SUBSCRIPTION MODULE registration.");
