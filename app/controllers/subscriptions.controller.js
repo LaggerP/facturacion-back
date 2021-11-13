@@ -94,15 +94,11 @@ exports.createExternalSubscription = async (req, res) => {
 exports.createInternalSubscription = async (req, res) => {
     const {
         userId,
-        userObjectId,
         email,
         name,
         subscriptionId,
         packageId,
         cost,
-        firstName,
-        lastName,
-        telephone,
         uriImg
     } = req.body;
 
@@ -134,7 +130,7 @@ exports.createInternalSubscription = async (req, res) => {
         })
         if (regStatus === 200) {
             await sendRegistrationEmail(email, name);
-            res.status(201).json({msg:"Subscription updated successfully", sub:newSub});
+            res.status(201).json({msg: "Subscription updated successfully", sub: newSub});
         } else if (regStatus === 400) {
             await newSubscription.destroy();
             res.status(400).send("The subscription to modify doesn't exist - Bad SUBSCRIPTION MODULE registration.");
@@ -221,7 +217,7 @@ const deleteExternalSubscriptionPackage = async (payload) => {
  * DELETE packages where subscribed status is false and current day is equals updatedAt date
  * 10 * * * * - AT MINUTE 10 (00:10, 01:10, 02:10...)
  */
-const deleteSubscriptions = new CronJob('*/1 * * * *', async () => {
+const deleteSubscriptions = new CronJob('*/25 * * * *', async () => {
     console.log("SE CORRE CRON DE ELIMINACIÓN")
     const subs = await Subscription.findAll({where: {subscribed: false}})
     for (const sub of subs) {
