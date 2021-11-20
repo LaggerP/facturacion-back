@@ -217,7 +217,7 @@ const deleteExternalSubscriptionPackage = async (payload) => {
  * DELETE packages where subscribed status is false and current day is equals updatedAt date
  * 10 * * * * - AT MINUTE 10 (00:10, 01:10, 02:10...)
  */
-const deleteSubscriptions = new CronJob('*/1 * * * *', async () => {
+const deleteSubscriptions = new CronJob('10 * * * *', async () => {
     console.log("SE CORRE CRON DE ELIMINACIÓN")
     const subs = await Subscription.findAll({where: {subscribed: false}})
     for (const sub of subs) {
@@ -236,6 +236,9 @@ const deleteSubscriptions = new CronJob('*/1 * * * *', async () => {
     }
     const subs2 = await Subscription.findAll({where: {billState: 2}})
     for (const sub of subs2) {
+        //Para correcto funcionamiento descomentar la linea 242 y 253
+        //Esto corrobora si hay 7 días de demora en el pago
+        
         //if (checkDateNonPaid(sub.updatedAt)) {
             const externalDeleted = await deleteExternalSubscriptionPackage({
                 id_suscripcion: sub.subscriptionId,
