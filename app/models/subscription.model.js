@@ -38,6 +38,9 @@ module.exports = (sequelize, Sequelize) => {
         subscribed: {
             type: Sequelize.BOOLEAN
         },
+        uriImg: {
+            type: Sequelize.STRING
+        }
     });
     return Subscription;
 };

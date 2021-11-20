@@ -1,7 +1,7 @@
 # facturacion-back
 
 
-### Última actualización: _25/09/2021_
+### Última actualización: _29/10/2021_
 ___
 
 
@@ -24,13 +24,12 @@ Crear un archivo `.env` con las siguientes variables de entorno:
  FyA_AUTH_SECRET=tuSecretAuth
  FyA_AUTH_EXPIRES=1d
  FyA_AUTH_ROUNDS=10
- SECRET_MOBILE_JWT=secretDeMobile
- SECRET_WEB_JWT=secretDeWeb
- DEV_DB_HOST=localhost
- PROD_DB_PORT=3306
- DEV_DB_USER=tu_DB_local_USER
- DEV_DB_PASS=tu_DB_local_PASS
- DEV_DB_DB=tu_DB_local_DB
+ FyA_EMAIL_USER=tuUserEmail
+ FyA_EMAIL_PASS=tuPasswordEmail
+ FyA_EMAIL_SMTP=tuSMTP
+ SECRET_SSO_FyA_JWT=tokenSuministradoPorSSO
+ SECRET_SUBSCRIPTIONS_KEY=keySecretaDeSuscripciones
+ DEV_DATABASE_URL=tu_DB_URI_local_Postgres
 ```
 
 ___
