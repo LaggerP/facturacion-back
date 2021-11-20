@@ -236,7 +236,7 @@ const deleteSubscriptions = new CronJob('*/1 * * * *', async () => {
     }
     const subs2 = await Subscription.findAll({where: {billState: 2}})
     for (const sub of subs2) {
-        //if (checkDateNonPaid(sub.updatedAt)) {
+        if (checkDateNonPaid(sub.updatedAt)) {
             const externalDeleted = await deleteExternalSubscriptionPackage({
                 id_suscripcion: sub.subscriptionId,
                 paquete: sub.packageId
@@ -247,7 +247,7 @@ const deleteSubscriptions = new CronJob('*/1 * * * *', async () => {
             } else {
                 console.log(`STATUS: ${externalDeleted} MESSAGE: The package to remove doesn't exist in the given subscription - BILL STATE DEMORADO`)
             }
-        //}
+        }
     }
 }, null, true, 'America/Buenos_Aires');
 
